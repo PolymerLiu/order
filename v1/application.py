@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
+import os
 
 # 实现配置按需加载
 # 定义一个Application类，继承自flask
@@ -11,6 +12,8 @@ class Application(Flask):
     # 从指定文件夹加载文件
     self.config.from_pyfile('config/base_setting.py')
 
+    if 'ops_config' in os.environ:
+      self.config.from_pyfile('config/%s_setting.py'%os.environ['ops_config'])
 
     db.init_app(self)
 
