@@ -37,16 +37,17 @@ ln -s /usr/local/python3/bin/python3 /usr/bin/python3
 cd ~
 4. virtualenv -p /usr/bin/python3  imooc_env
 
-cd imooc_env
-激活python3
-source bin/activate
+激活对应虚拟环境
+source imooc/bin/activate
 
 
 cd ~
 # linux共享目录
 
-1.mkdir /mnt/cdrom
-2.mount /dev/cdrom /mnt/cdrom
+1.新建一个文件夹
+mkdir /mnt/cdrom
+2.将文件夹进行挂载
+mount /dev/cdrom /mnt/cdrom
 
 cp -R /mnt/cdrom /usr/local/src/VBoxAdditions
 
