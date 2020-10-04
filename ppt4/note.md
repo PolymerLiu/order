@@ -1,5 +1,18 @@
-参考文档
+# 参考文档
+flask 
 http://docs.jinkan.org/docs/flask/quickstart.html#a-minimal-application
+
+flask-sqlalchemy
+http://www.pythondoc.com/flask-sqlalchemy/quickstart.html
+https://flask-sqlalchemy.palletsprojects.com/en/2.x/quickstart/#a-minimal-application
+
+
+4.8数据库ORM
+pip install flask-sqlalchemy
+
+yum -y install mysql-devel gcc gcc-devel python-devel
+
+pip install mysqlclient
 
 
 # 防火墙操作
