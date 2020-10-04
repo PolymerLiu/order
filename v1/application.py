@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_script import Manager
 
 # 实现配置按需加载
 # 定义一个Application类，继承自flask
@@ -15,3 +16,6 @@ class Application(Flask):
 
 db = SQLAlchemy()
 app = Application(__name__)
+
+# 将app进行一次包装
+manager = Manager(app)
