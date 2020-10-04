@@ -1,5 +1,6 @@
 from application import app,manager
 from flask_script import Server
+import www
 
 # web server
 # 添加不同的命令
