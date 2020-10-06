@@ -138,6 +138,23 @@ var common_ops = {
         $('html, body').animate({
             scrollTop: target.offset().top - 10
         }, 100);
+    },
+    buildUrl:function (path,params) {
+        var url = '' + path
+        var _paramUrl = ''
+        // params = {
+        //     a:'b',
+        //     c:'d',
+        // }
+        // 'a=b&c=d'
+        // 将传进来的参数拼接成链接
+        if(params){
+            _paramUrl = Object.keys(params).map(function (k) {
+                return[encodeURIComponent[k],encodeURIComponent[params[k]]].join('=')
+            }).join('&')
+            _paramUrl = '?' + _paramUrl
+        }
+        return url + _paramUrl
     }
 };
 
