@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint,render_template,request,jsonify
+from flask import Blueprint,render_template,request,jsonify,make_response
+import json
 from common.models.User import User
 from common.libs.user.UserService import UserService
+from application import app
 
 route_user = Blueprint( 'user_page',__name__ )
 
@@ -24,7 +26,7 @@ def login():
         resp['msg'] = '请输入正确的登录密码~~'
         return jsonify(resp)
     
-    
+
     user_info = User.query.filter_by(login_name=login_name).first()
     if not user_info:
         resp['code'] = -1
@@ -35,7 +37,12 @@ def login():
         resp['code'] = -1
         resp['msg'] = '请输入正确的用户名和登录密码~~2'
         return jsonify(resp)
-    return jsonify(resp)
+
+    # 使用cookie存储用户的登录状态
+    response = make_response(json.dumps(resp))
+    response.set_cookie(app.config['AUTH_COOKIE_NAME'],'%s#%s'%(UserService.geneAuthCode(user_info),user_info.uid))
+
+    return response
 
 @route_user.route( "/edit" )
 def edit():
