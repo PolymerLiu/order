@@ -66,7 +66,7 @@ def edit():
 
     if email is None or len(email) < 1:
         resp['code'] = -1
-        resp['msg'] = '请输入符合规范的姓名~~'
+        resp['msg'] = '请输入符合规范的邮箱~~'
         return jsonify(resp)
 
     user_info = g.current_user
