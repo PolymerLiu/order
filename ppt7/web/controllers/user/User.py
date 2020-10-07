@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint,request,jsonify,make_response,redirect
+from flask import Blueprint,request,jsonify,make_response,redirect,g
 import json
 from common.models.User import User
 from common.libs.user.UserService import UserService
-from application import app
+from application import app,db
 from common.libs.UrlManager import UrlManager
 from common.libs.Helper import ops_render
 
@@ -13,7 +13,7 @@ route_user = Blueprint( 'user_page',__name__ )
 def login():
     if request.method=='GET':
         return ops_render( "user/login.html" )
-
+    # 处理post请求
     resp = {'code':200,'msg':'登录成功','data':{}}
     req = request.values
     login_name = req['login_name'] if 'login_name' in req else ''
@@ -46,9 +46,32 @@ def login():
 
     return response
 
-@route_user.route( "/edit" )
+@route_user.route( "/edit",methods = ['GET','POST'] )
 def edit():
-    return ops_render( "user/edit.html" )
+    if request.method=='GET':
+        return ops_render( "user/edit.html" )
+
+    resp = {'code':200,'msg':'操作成功','data':{}}
+    req = request.values
+    nickname = req['nickname'] if 'nickname' in req else ''
+    email = req['email'] if 'email' in req else ''
+    if nickname is None or len(nickname) < 1:
+        resp['code'] = -1
+        resp['msg'] = '请输入符合规范的姓名~~'
+        return jsonify(resp)
+
+    if email is None or len(email) < 1:
+        resp['code'] = -1
+        resp['msg'] = '请输入符合规范的姓名~~'
+        return jsonify(resp)
+
+    user_info = g.current_user
+    user_info.nickname = nickname
+    user_info.email = email
+
+    db.session.add(user_info)
+    db.session.commit()
+    return jsonify(resp)
 
 @route_user.route( "/reset-pwd" )
 def resetPwd():
