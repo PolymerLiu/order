@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint,render_template,request,jsonify,make_response
+from flask import Blueprint,render_template,request,jsonify,make_response,redirect
 import json
 from common.models.User import User
 from common.libs.user.UserService import UserService
 from application import app
+from common.libs.UrlManager import UrlManager
 
 route_user = Blueprint( 'user_page',__name__ )
 
@@ -51,3 +52,9 @@ def edit():
 @route_user.route( "/reset-pwd" )
 def resetPwd():
     return render_template( "user/reset_pwd.html" )
+
+@route_user.route( "/logout" )
+def logout():
+    response = make_response(redirect(UrlManager.buildUrl('/user/login')))
+    response.delete_cookie(app.config['AUTH_COOKIE_NAME'])
+    return response
