@@ -17,7 +17,9 @@ def before_request():
   if pattern.match(path):
     return
 
+  # 检查用户是否已经登录，如果登录则返回对应的用户信息
   user_info = check_login()
+  # 将用户信息赋值给g.current_user
   g.current_user = None
   if user_info:
     g.current_user = user_info

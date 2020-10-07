@@ -42,14 +42,18 @@ def login():
 
     # 使用cookie存储用户的登录状态
     response = make_response(json.dumps(resp))
-    response.set_cookie(app.config['AUTH_COOKIE_NAME'],'%s#%s'%(UserService.geneAuthCode(user_info),user_info.uid))
+    response.set_cookie(
+        app.config['AUTH_COOKIE_NAME'],
+        '%s#%s'%(UserService.geneAuthCode(user_info),user_info.uid),
+        60*60*24*120
+    )
 
     return response
 
 @route_user.route( "/edit",methods = ['GET','POST'] )
 def edit():
     if request.method=='GET':
-        return ops_render( "user/edit.html" )
+        return ops_render( "user/edit.html",{'current':'edit'} )
 
     resp = {'code':200,'msg':'操作成功','data':{}}
     req = request.values
@@ -73,9 +77,46 @@ def edit():
     db.session.commit()
     return jsonify(resp)
 
-@route_user.route( "/reset-pwd" )
+@route_user.route( "/reset-pwd" ,methods = ['GET','POST'] )
 def resetPwd():
-    return ops_render( "user/reset_pwd.html" )
+    if request.method=='GET':
+        return ops_render( "user/reset_pwd.html",{'current':'reset-pwd'} )
+
+    resp = {'code':200,'msg':'操作成功','data':{}}
+    req = request.values
+    old_password = req['old_password'] if 'old_password' in req else ''
+    new_password = req['new_password'] if 'new_password' in req else ''
+    if old_password is None or len(old_password) < 6:
+        resp['code'] = -1
+        resp['msg'] = '请输入符合规范的原密码~~'
+        return jsonify(resp)
+
+    if new_password is None or len(new_password) < 6:
+        resp['code'] = -1
+        resp['msg'] = '请输入符合规范的新密码~~'
+        return jsonify(resp)
+
+    if new_password == old_password:
+        resp['code'] = -1
+        resp['msg'] = '请重新输入一个吧，新密码和原密码不能相同哦~~'
+        return jsonify(resp)
+
+    user_info = g.current_user
+    user_info.login_pwd = UserService.genePwd(new_password,user_info.login_salt)
+    app.logger.info(user_info.login_pwd)
+
+    db.session.add(user_info)
+    db.session.commit()
+
+    # 更新密码后要及时更新cookie，否则用户会退出
+    response = make_response(json.dumps(resp))
+    response.set_cookie(
+        app.config['AUTH_COOKIE_NAME'],
+        '%s#%s'%(UserService.geneAuthCode(user_info),user_info.uid),
+        60*60*24*120
+    )
+    return response
+
 
 @route_user.route( "/logout" )
 def logout():
