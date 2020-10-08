@@ -177,6 +177,8 @@ def set():
     model_user.update_time = getCurrentDate()
     if login_pwd != default_pwd:
         model_user.login_pwd = UserService.genePwd(login_pwd,model_user.login_salt)
+    # else:
+    #     model_user.login_pwd = UserService.genePwd(default_pwd,model_user.login_salt)
         
 
     db.session.add(model_user)

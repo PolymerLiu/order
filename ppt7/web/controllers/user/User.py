@@ -40,6 +40,11 @@ def login():
         resp['msg'] = '请输入正确的用户名和登录密码~~2'
         return jsonify(resp)
 
+    if user_info.status != 1:
+        resp['code'] = -1
+        resp['msg'] = '账号已被禁用，请联系管理员进行处理~~'
+        return jsonify(resp)
+
     # 使用cookie存储用户的登录状态
     response = make_response(json.dumps(resp))
     response.set_cookie(

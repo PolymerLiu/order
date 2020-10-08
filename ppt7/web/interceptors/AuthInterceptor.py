@@ -58,5 +58,8 @@ def check_login():
   
   if auth_info[0] != UserService.geneAuthCode(user_info):
     return False
+  # 非正常状态的账号，应该禁止其任何操作
+  if user_info.status != 1:
+    return False
 
   return user_info
