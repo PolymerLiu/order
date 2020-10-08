@@ -63,7 +63,7 @@ var account_set_ops = {
         data:data,
         dataType:'json',
         success:function (res) {
-          btn_target.addClass('disabled')
+          btn_target.removeClass('disabled')
           var callback = null
           if (res.code === 200) {
             callback = function () {

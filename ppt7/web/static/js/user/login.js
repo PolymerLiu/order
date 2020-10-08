@@ -33,7 +33,7 @@ var user_login_ops = {
         },
         dataType:'json',
         success:function (res) {
-          btn_target.addClass('disabled')
+          btn_target.removeClass('disabled')
           var callback = null
           if (res.code === 200) {
             callback = function () {
