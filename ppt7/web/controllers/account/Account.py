@@ -14,14 +14,14 @@ def index():
     query = User.query
     req = request.values
 
-    page = int(req['page']) if ('page' in req and req['page']) else 1
+    page = int(req['p']) if ('p' in req and req['p']) else 1
 
     page_params = {
         'total': query.count(),
         'page_size': app.config['PAGE_SIZE'],
         'page': page,
         'display': app.config['PAGE_DISPLAY'],
-        'url': '/account/index'
+        'url': request.full_path.replace('&p={}'.format(page),'')
     }
     pages = iPagination(page_params)
     # 想查询页码的第一条数据
