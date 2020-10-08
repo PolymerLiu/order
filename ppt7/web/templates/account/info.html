@@ -46,9 +46,18 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-									<tr><td colspan="2">暂无数据</td></tr>
+                                    {% if access_list %}
+                                    {% for item in access_list %}
+                                    <tr>
+                                        <td>{{item.created_time}}</td>
+                                        <td>{{item.target_url}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% endif %}
                                      </tbody>
                                 </table>
+                                <!--分页代码已被封装到统一模板文件中-->
+                                {% include 'common/pagenation.html' %}
                             </div>
                         </div>
                     </div>

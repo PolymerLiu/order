@@ -2,6 +2,7 @@
 from flask import Blueprint,request,redirect,jsonify
 from common.libs.Helper import ops_render,iPagination,getCurrentDate
 from common.models.User import User
+from common.models.log.AppAccessLog import AppAccessLog
 from common.libs.UrlManager import UrlManager
 from common.libs.user.UserService import UserService
 from application import app,db
@@ -97,6 +98,28 @@ def info():
     if not info:
         return redirect(reback_url)
     resp_data['info'] = info
+
+    page = int(req['p']) if ('p' in req and req['p']) else 1
+    query = AppAccessLog.query.filter_by(uid=uid)
+
+    page_params = {
+        'total': query.count(),
+        'page_size': app.config['PAGE_SIZE'],
+        'page': page,
+        'display': app.config['PAGE_DISPLAY'],
+        'url': request.full_path.replace('&p={}'.format(page),'')
+    }
+    pages = iPagination(page_params)
+    # 想查询页码的第一条数据
+    offset = (page - 1) * app.config['PAGE_SIZE']
+    # 想查询页码的最后一条数据
+    limit = app.config['PAGE_SIZE'] * page
+
+    access_list = query.order_by(AppAccessLog.uid.desc()).all()[offset:limit]
+
+
+    resp_data['access_list'] = access_list
+    resp_data['pages'] = pages
 
     return ops_render( "account/info.html",resp_data )
 
