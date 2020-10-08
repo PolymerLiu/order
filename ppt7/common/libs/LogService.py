@@ -1,4 +1,5 @@
 from common.models.log.AppAccessLog import AppAccessLog
+from common.models.log.AppErrorLog import AppErrorLog
 from common.libs.Helper import getCurrentDate
 from flask import request,g
 from application import db,app
@@ -21,7 +22,18 @@ class LogService():
 
     db.session.add(target)
     db.session.commit()
+    return True
 
   @staticmethod
-  def addErrorLog():
-    pass
+  def addErrorLog(content):
+    target = AppErrorLog()
+    target.target_url = request.url
+    target.referer_url = request.referrer
+    target.query_params = json.dumps(request.values.to_dict())
+    target.content = content
+
+    target.created_time = getCurrentDate()
+
+    db.session.add(target)
+    db.session.commit()
+    return True

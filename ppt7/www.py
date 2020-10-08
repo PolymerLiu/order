@@ -3,6 +3,7 @@ from application import app
 
 # 统一拦截器
 from web.interceptors.AuthInterceptor import *
+from web.interceptors.ErrorInterceptor import *
 
 
 # 蓝图功能，对所有的url进行蓝图功能配置
