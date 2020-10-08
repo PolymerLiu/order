@@ -30,3 +30,36 @@ VALUES
 
 查询表数据
 select * from user \G;	
+
+
+
+
+# 用户访问记录表&app错误日表
+
+DROP TABLE IF EXISTS `app_access_log`;
+
+CREATE TABLE `app_access_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uid` bigint(20) NOT NULL DEFAULT '0' COMMENT 'uid',
+  `referer_url` varchar(255) NOT NULL DEFAULT '' COMMENT '当前访问的refer',
+  `target_url` varchar(255) NOT NULL DEFAULT '' COMMENT '访问的url',
+  `query_params` text NOT NULL COMMENT 'get和post参数',
+  `ua` varchar(255) NOT NULL DEFAULT '' COMMENT '访问ua',
+  `ip` varchar(32) NOT NULL DEFAULT '' COMMENT '访问ip',
+  `note` varchar(1000) NOT NULL DEFAULT '' COMMENT 'json格式备注字段',
+  `created_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_uid` (`uid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户访问记录表';
+
+
+DROP TABLE IF EXISTS `app_error_log`;
+CREATE TABLE `app_error_log` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `referer_url` varchar(255) NOT NULL DEFAULT '' COMMENT '当前访问的refer',
+  `target_url` varchar(255) NOT NULL DEFAULT '' COMMENT '访问的url',
+  `query_params` text NOT NULL COMMENT 'get和post参数',
+  `content` longtext NOT NULL COMMENT '日志内容',
+  `created_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '插入时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='app错误日表';

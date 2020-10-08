@@ -3,6 +3,7 @@ from flask import request,redirect,g
 from common.models.User import User
 from common.libs.user.UserService import UserService
 from common.libs.UrlManager import UrlManager
+from common.libs.LogService import LogService
 import re
 
 # 在请求到达controller之前，先经过before_request
@@ -23,6 +24,10 @@ def before_request():
   g.current_user = None
   if user_info:
     g.current_user = user_info
+
+  # 加入用户访问日志
+  LogService.addAccessLog()
+
 
   # 如果是登录页面，也不需要授权校验
   pattern = re.compile('%s' % '|'.join(ignore_urls))
