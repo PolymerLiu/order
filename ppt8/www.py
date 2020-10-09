@@ -14,6 +14,7 @@ from web.controllers.finance.Finance import route_finance
 from web.controllers.food.Food import route_food
 from web.controllers.member.Member import route_member
 from web.controllers.stat.Stat import route_stat
+from web.controllers.api import route_api
 
 # 每次增加新的模块都要注册
 app.register_blueprint(route_index,url_prefix='/')
@@ -23,3 +24,4 @@ app.register_blueprint(route_finance,url_prefix='/finance')
 app.register_blueprint(route_food,url_prefix='/food')
 app.register_blueprint(route_member,url_prefix='/member')
 app.register_blueprint(route_stat,url_prefix='/stat')
+app.register_blueprint(route_api,url_prefix='/api')

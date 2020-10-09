@@ -50,7 +50,7 @@ App({
         })
     },
     console:function( msg ){
-        console.log( msg);
+        console.log( 'msg+++++++++++++',msg);
     },
     getRequestHeader:function(){
         return {
