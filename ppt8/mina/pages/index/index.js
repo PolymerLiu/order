@@ -43,16 +43,25 @@ Page({
       app.alert({'content':'登录失败，请再次点击~~'})
     }
     var data = e.detail.userInfo
-    wx.request({
-      url:'http://192.168.1.8:8000/api/member/login',
-      data:data,
-      header:app.getRequestHeader(),
-      method:'POST',
-      success:function (res) {
-        app.console(res)
-      },
-      fail:function () {
-      
+    wx.login({
+      success (res) {
+        if (!res.code) {
+          app.alert({'content':'登录失败，请再次点击~~'})
+          return
+        }
+        data['code'] = res.code
+        wx.request({
+          url:'http://192.168.1.8:8000/api/member/login',
+          data:data,
+          header:app.getRequestHeader(),
+          method:'POST',
+          success:function (res) {
+            app.console(res)
+          },
+          fail:function () {
+          
+          }
+        })
       }
     })
   }
