@@ -5,7 +5,8 @@ Page({
   data: {
     remind: '加载中',
     angle: 0,
-    userInfo: {}
+    userInfo: {},
+    regFlag:true
   },
   goToIndex:function(){
     wx.switchTab({
@@ -21,6 +22,8 @@ Page({
 
   },
   onReady: function(){
+    // 进入小程序检验是否已经登录过
+    this.checkLogin()
     var that = this;
     setTimeout(function(){
       that.setData({
@@ -38,11 +41,10 @@ Page({
       }
     });
   },
-  login:function (e) {
-    if (!e.detail.userInfo) {
-      app.alert({'content':'登录失败，请再次点击~~'})
-    }
-    var data = e.detail.userInfo
+
+  checkLogin: function () {
+    var data = {}
+    var that = this
     wx.login({
       success (res) {
         if (!res.code) {
@@ -51,15 +53,50 @@ Page({
         }
         data['code'] = res.code
         wx.request({
-          url:'http://192.168.1.8:8000/api/member/login',
+          url:app.buildUrl('/member/check-reg'),
           data:data,
           header:app.getRequestHeader(),
           method:'POST',
           success:function (res) {
-            app.console(res)
-          },
-          fail:function () {
-          
+            if (res.data.code != 200) {
+              that.setData({
+                regFlag:false
+              })
+              return
+            }
+            that.goToIndex()
+            app.setCache('token',res.data.data.token)
+          }
+        })
+      }
+    })
+    
+  },
+  login:function (e) {
+    var data = e.detail.userInfo
+    var that = this
+    if (!e.detail.userInfo) {
+      app.alert({'content':'登录失败，请再次点击~~'})
+    }
+    wx.login({
+      success (res) {
+        if (!res.code) {
+          app.alert({'content':'登录失败，请再次点击~~'})
+          return
+        }
+        data['code'] = res.code
+        wx.request({
+          url:app.buildUrl('/member/login'),
+          data:data,
+          header:app.getRequestHeader(),
+          method:'POST',
+          success:function (res) {
+            if (res.data.code != 200) {
+              app.alert({'content':res.data.msg})
+              return
+            }
+            app.setCache('token',res.data.data.token)
+            that.goToIndex()
           }
         })
       }

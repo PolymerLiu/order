@@ -13,10 +13,10 @@
       </view>
       <view class="bd">
          <image class="smalltitle" src="/images/more/confirm-word1.png"></image>
-        <!-- <view class="confirm-btn" bindtap='goToIndex'>
+        <view class="confirm-btn" bindtap='goToIndex' wx:if="{{regFlag}}">
           <text >走吧，订餐去</text>
-        </view> -->
-         <button class="confirm-btn" open-type="getUserInfo" bindgetuserinfo="login">授权登录</button>
+        </view>
+         <button class="confirm-btn" open-type="getUserInfo" wx:if="{{!regFlag}}" bindgetuserinfo="login">授权登录</button>
         <text class="copyright">@编程浪子 54php.cn</text>
       </view>
     </view>
