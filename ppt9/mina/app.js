@@ -6,7 +6,7 @@ App({
         userInfo: null,
         version: "1.0",
         shopName: "Python3 + Flask 订餐全栈系统",
-        domain:"http://192.168.0.119:8999/api"
+        domain:"http://192.168.1.8:8000/api"
     },
     tip:function( params ){
         var that = this;
@@ -50,11 +50,34 @@ App({
         })
     },
     console:function( msg ){
-        console.log( msg);
+        console.log( 'msg+++++++++++++',msg);
     },
     getRequestHeader:function(){
         return {
             'content-type': 'application/x-www-form-urlencoded'
         }
+    },
+    buildUrl:function (path,params) {
+        var url = this.globalData.domain + path
+        var _paramUrl = ''
+        if(params){
+            _paramUrl = Object.keys(params).map(function (k) {
+                return[encodeURIComponent[k],encodeURIComponent[params[k]]].join('=')
+            }).join('&')
+            _paramUrl = '?' + _paramUrl
+        }
+        return url + _paramUrl
+    },
+    getCache:function (key) {
+        var value = undefined
+        try {
+            value = wx.getStorageSync('key')
+          } catch (e) {}
+    },
+    setCache:function (key,value) {
+        wx.setStorage({
+            key,
+            data:value
+        })
     }
 });
