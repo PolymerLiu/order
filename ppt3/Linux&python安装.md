@@ -49,6 +49,7 @@ mkdir /mnt/cdrom
 2.将文件夹进行挂载
 mount /dev/cdrom /mnt/cdrom
 
+--
 cp -R /mnt/cdrom /usr/local/src/VBoxAdditions
 
 yum install -y gcc gcc-devel gcc-c++ gcc-c++-devel make kernel kernel-devel bzip2
