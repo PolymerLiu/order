@@ -15,7 +15,7 @@ var member_set_ops = {
       var nickname = nickname_target.val()
 
       if (nickname.length < 1) {
-        common_ops.tip('请输入符合规范的姓名~~')
+        common_ops.tip('请输入符合规范的姓名~~',nickname_target)
         return
       }
       btn_target.addClass('disabled')
