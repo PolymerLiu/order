@@ -1,5 +1,5 @@
 # coding: utf-8
-from application import db
+from application import db,app
 
 class FoodCat(db.Model):
     __tablename__ = 'food_cat'
@@ -10,3 +10,6 @@ class FoodCat(db.Model):
     status = db.Column(db.Integer, nullable=False, server_default=db.FetchedValue(), info='?? 1??? 0???')
     updated_time = db.Column(db.DateTime, nullable=False, server_default=db.FetchedValue(), info='????????')
     created_time = db.Column(db.DateTime, nullable=False, server_default=db.FetchedValue(), info='????')
+    @property
+    def status_desc(self):
+        return app.config['STATUS_MAPPING'][str(self.status)]
