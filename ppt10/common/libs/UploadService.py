@@ -1,6 +1,7 @@
 from werkzeug.utils import secure_filename
-from application import app
+from application import app,db
 from common.libs.Helper import getCurrentDate
+from common.models.Image import Image
 import os,stat,uuid
 
 class UploadService:
@@ -25,9 +26,18 @@ class UploadService:
       os.chmod(save_dir,stat.S_IRWXU | stat.S_IRGRP | stat.S_IRWXO)
 
     filename = str(uuid.uuid4()).replace('-','') + '.' + ext
+    # 保存图片
     file.save('{0}/{1}'.format(save_dir,filename))
 
+    # 存储图片相关信息
+    file_key = file_dir + '/' + filename
+    model_image = Image()
+    model_image.file_key = file_key
+    model_image.created_time = getCurrentDate()
+    db.session.add(model_image)
+    db.session.commit()
+
     resp['data'] = {
-      'file_key': file_dir + '/' + filename
+      'file_key': file_key
     }
     return resp

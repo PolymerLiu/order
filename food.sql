@@ -168,7 +168,7 @@ CREATE TABLE `images` (
   `file_key` varchar(60) NOT NULL DEFAULT '' COMMENT '文件名',
   `created_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '插入时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4  COMMENT='存储已经成功上传图片的相关信息';
 
 
 DROP TABLE IF EXISTS `member_address`;
