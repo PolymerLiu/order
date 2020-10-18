@@ -8,16 +8,23 @@ route_food = Blueprint( 'food_page',__name__ )
 
 @route_food.route( "/index" )
 def index():
-    return ops_render( "food/index.html" )
+    resp_data = {}
+    resp_data['current'] = 'index'
+
+    return ops_render( "food/index.html",resp_data )
 
 @route_food.route( "/info" )
 def info():
-    return ops_render( "food/info.html" )
+    resp_data = {}
+    resp_data['current'] = 'index'
+    return ops_render( "food/info.html",resp_data )
 
 
 @route_food.route( "/set" )
 def set():
-    return ops_render( "food/set.html" )
+    resp_data = {}
+    resp_data['current'] = 'index'
+    return ops_render( "food/set.html",resp_data )
 
 
 @route_food.route( "/cat" )
