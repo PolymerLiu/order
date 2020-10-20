@@ -10,7 +10,7 @@ from decimal import *
 from sqlalchemy import or_
 
 route_food = Blueprint( 'food_page',__name__ )
-
+# 美食列表
 @route_food.route( "/index" )
 def index():
     resp_data = {}
@@ -56,14 +56,63 @@ def index():
 
     resp_data['current'] = 'index'
     return ops_render( "food/index.html",resp_data )
-
+# 美食详情
 @route_food.route( "/info" )
 def info():
     resp_data = {}
+    req = request.args
+    id = int(req.get('id',0))
+    reback_url = UrlManager.buildUrl('/food/index')
+    if id < 1:
+        return redirect(reback_url)
+        
+    info = Food.query.filter_by(id=id).first()
+    if not info:
+        return redirect(reback_url)
+
+    stock_change_list = FoodStockChangeLog.query.filter(FoodStockChangeLog.food_id == id).order_by(FoodStockChangeLog.id.desc()).all()
+
+    resp_data['stock_change_list'] = stock_change_list
+    resp_data['info'] = info
     resp_data['current'] = 'index'
     return ops_render( "food/info.html",resp_data )
 
+# 美食列表操作
+@route_food.route( "/ops",methods=['POST'] )
+def indexOps():
+    req = request.values
+    resp = {'code':200,'msg':'操作成功','data':{}}
 
+    id = req['id'] if 'id' in req else ''
+    act = req['act'] if 'act' in req else ''
+    if not id:
+        resp['code'] = -1
+        resp['msg'] = '请选择要操作的账号~~'
+        return jsonify(resp)
+    
+    if act not in ['remove','recover']:
+        resp['code'] = -1
+        resp['msg'] = '操作有误，请重试~~'
+        return jsonify(resp)
+
+    info = Food.query.filter_by(id=id).first()
+    if not info:
+        resp['code'] = -1
+        resp['msg'] = '指定账号不存在~~'
+        return jsonify(resp)
+
+    if act == 'remove':
+        info.status = 0
+    elif act == 'recover':
+        info.status = 1
+    
+    info.update_time = getCurrentDate()
+    db.session.add(info)
+    db.session.commit()
+
+    return jsonify(resp)
+
+# 美食新建&编辑
 @route_food.route( "/set",methods=['GET','POST'] )
 def set():
     if request.method == 'GET':
@@ -168,7 +217,7 @@ def set():
 
     return jsonify(resp)
 
-
+# 分类列表
 @route_food.route( "/cat" )
 def cat():
     resp_data = {}
@@ -186,9 +235,9 @@ def cat():
     resp_data['search_con'] = req
 
     return ops_render( "food/cat.html",resp_data )
-
+# 分类列表操作
 @route_food.route( "/cat-ops",methods=['POST'] )
-def ops():
+def catOps():
     req = request.values
     resp = {'code':200,'msg':'操作成功','data':{}}
 
@@ -220,7 +269,7 @@ def ops():
     db.session.commit()
 
     return jsonify(resp)
-
+# 分类新建&修改 
 @route_food.route( "/cat-set" ,methods=['GET','POST'] )
 def catSet():
     if request.method == 'GET':
