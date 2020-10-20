@@ -157,7 +157,9 @@ var common_ops = {
         return url + _paramUrl
     },
     buildPicUrl:function (img_key) {
-        return 'http://192.168.1.8:8000/static/upload/' + img_key
+        var domain = $('.hidden_layout_warp input[name=domain]').val()
+        var prefix_url = $('.hidden_layout_warp input[name=prefix_url]').val()
+        return domain + prefix_url + img_key
     }
 };
 
