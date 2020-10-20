@@ -1,20 +1,60 @@
 # -*- coding: utf-8 -*-
 from flask import Blueprint,request,jsonify,redirect
-from common.libs.Helper import ops_render,getCurrentDate
+from common.libs.Helper import ops_render,getCurrentDate,iPagination,getDictFilterField
 from common.libs.UrlManager import UrlManager
 from common.models.food.FoodCat import FoodCat
 from common.models.food.FoodStockChangeLog import FoodStockChangeLog
 from common.models.food.Food import Food
 from application import app,db
 from decimal import *
+from sqlalchemy import or_
 
 route_food = Blueprint( 'food_page',__name__ )
 
 @route_food.route( "/index" )
 def index():
     resp_data = {}
-    resp_data['current'] = 'index'
+    query = Food.query
+    req = request.values
 
+    page = int(req['p']) if ('p' in req and req['p']) else 1
+    # 混合查询
+    if 'mix_kw' in req:
+        # ilike忽略大小写进行查询
+
+        rule = or_( 
+            Food.name.ilike('%{0}%'.format(req['mix_kw'])), 
+            Food.tags.ilike('%{0}%'.format(req['mix_kw']))
+        )
+        query = query.filter(rule)
+    
+    if 'status' in req and int(req['status']) > -1:
+        query = query.filter(Food.status == int(req['status']))
+
+    if 'cat_id' in req and int(req['cat_id']) > 0:
+        query = query.filter(Food.cat_id == int(req['cat_id']))
+
+    page_params = {
+        'total': query.count(),
+        'page_size': app.config['PAGE_SIZE'],
+        'page': page,
+        'display': app.config['PAGE_DISPLAY'],
+        'url': request.full_path.replace('&p={}'.format(page),'')
+    }
+    pages = iPagination(page_params)
+    offset = (page - 1) * app.config['PAGE_SIZE']
+    limit = app.config['PAGE_SIZE'] * page
+
+    # 查询全量数据，并进行倒序排序
+    list = query.order_by(Food.id.desc()).all()[offset:limit]
+    cat_mapping = getDictFilterField(FoodCat,'id','id',[])
+    resp_data['pages'] = pages
+    resp_data['list'] = list
+    resp_data['search_con'] = req
+    resp_data['status_mapping'] = app.config['STATUS_MAPPING']
+    resp_data['cat_mapping'] = cat_mapping
+
+    resp_data['current'] = 'index'
     return ops_render( "food/index.html",resp_data )
 
 @route_food.route( "/info" )
