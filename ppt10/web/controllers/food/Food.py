@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint,request,jsonify
+from flask import Blueprint,request,jsonify,redirect
 from common.libs.Helper import ops_render,getCurrentDate
+from common.libs.UrlManager import UrlManager
 from common.models.food.FoodCat import FoodCat
+from common.models.food.FoodStockChangeLog import FoodStockChangeLog
+from common.models.food.Food import Food
 from application import app,db
+from decimal import *
 
 route_food = Blueprint( 'food_page',__name__ )
 
@@ -20,11 +24,109 @@ def info():
     return ops_render( "food/info.html",resp_data )
 
 
-@route_food.route( "/set" )
+@route_food.route( "/set",methods=['GET','POST'] )
 def set():
-    resp_data = {}
-    resp_data['current'] = 'index'
-    return ops_render( "food/set.html",resp_data )
+    if request.method == 'GET':
+        resp_data = {}
+        req = request.args
+        cat_list = FoodCat.query.all()
+        id = int(req.get('id',0))
+        info = None
+        if id :
+            info = Food.query.filter_by(id=id).first()
+
+        if info and info.status != 1:
+            return redirect(UrlManager('/food/index'))
+
+        resp_data['cat_list'] = cat_list
+        resp_data['info'] = info
+        resp_data['current'] = 'index'
+        return ops_render( "food/set.html",resp_data )
+
+
+    req = request.values
+    resp = {'code':200,'msg':'操作成功','data':{}}
+
+    id = int(req['id']) if 'id' in req else ''
+    cat_id = int(req['cat_id']) if 'cat_id' in req else ''
+    name = req['name'] if 'name' in req else ''
+    price = req['price'] if 'price' in req else ''
+    main_image = req['main_image'] if 'main_image' in req else ''
+    summary = req['summary'] if 'summary' in req else ''
+    stock = int(req['stock']) if 'stock' in req else ''
+    tags = req['tags'] if 'tags' in req else ''
+
+    price = Decimal(price).quantize(Decimal('0.00'))
+
+    if cat_id<1:
+        resp['code'] = -1
+        resp['msg'] = '请选择分类~~'
+        return jsonify(resp)
+
+    if name is None or len(name)<1:
+        resp['code'] = -1
+        resp['msg'] = '请输入符合规范的名称~~'
+        return jsonify(resp)
+
+    if price<= 0:
+        resp['code'] = -1
+        resp['msg'] = '请输入符合规范售卖价格~~'
+        return jsonify(resp)
+
+    if main_image is None or len(main_image)<3:
+        resp['code'] = -1
+        resp['msg'] = '请上传封面图片~~'
+        return jsonify(resp)
+
+    if summary is None or len(summary)<3:
+        resp['code'] = -1
+        resp['msg'] = '请输入图文描述，并且不能少于10个字符~~'
+        return jsonify(resp)
+
+    if stock< 1:
+        resp['code'] = -1
+        resp['msg'] = '请输入符合规范库存量~~'
+        return jsonify(resp)
+
+    if tags is None or len(tags)<1:
+        resp['code'] = -1
+        resp['msg'] = '请输入标签，便于搜索~~'
+        return jsonify(resp)
+
+    # 美食信息
+    food_info = Food.query.filter_by(id=id).first()
+    app.logger.info(food_info)
+    # 变更之前的库存
+    before_stock = 0
+    if food_info :
+        model_food = food_info
+        before_stock = model_food.stock
+    else:
+        model_food =Food()
+        model_food.status = 1
+        model_food.created_time = getCurrentDate()
+
+    model_food.cat_id = cat_id
+    model_food.name = name
+    model_food.price = price
+    model_food.main_image = main_image
+    model_food.summary = summary
+    model_food.stock = stock
+    model_food.tags = tags
+    model_food.updated_time = getCurrentDate()
+    db.session.add(model_food)
+    db.session.commit()
+
+    model_stock_change = FoodStockChangeLog()
+    model_stock_change.food_id = model_food.id
+    model_stock_change.unit = int(stock) - int(before_stock)
+    model_stock_change.total_stock = stock
+    model_stock_change.note = ''
+    model_stock_change.created_time = getCurrentDate()
+    db.session.add(model_stock_change)
+    db.session.commit()
+
+    return jsonify(resp)
 
 
 @route_food.route( "/cat" )
