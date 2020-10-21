@@ -136,7 +136,7 @@ def set():
     req = request.values
     resp = {'code':200,'msg':'操作成功','data':{}}
 
-    id = int(req['id']) if 'id' in req else ''
+    id = req['id'] if 'id' in req else ''
     cat_id = int(req['cat_id']) if 'cat_id' in req else ''
     name = req['name'] if 'name' in req else ''
     price = req['price'] if 'price' in req else ''
