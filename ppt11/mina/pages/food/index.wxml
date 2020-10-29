@@ -20,7 +20,7 @@
   <view class="type-container">
     <scroll-view class="type-navbar" scroll-x="true">
       <view class="type-box" wx:for-items="{{categories}}" wx:key="id">
-        <view id="{{item.id}}" class="type-navbar-item {{activeCategoryId == item.id ? 'type-item-on' : ''}}" >
+        <view id="{{item.id}}" class="type-navbar-item {{activeCategoryId == item.id ? 'type-item-on' : ''}}" bindtap="catClick" >
           {{item.name}}
         </view>
       </view>
