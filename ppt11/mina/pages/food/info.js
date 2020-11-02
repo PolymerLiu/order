@@ -25,7 +25,7 @@ Page({
         var that = this
         return{
             title: that.data.info.name,
-            path: '/page/info?id=' + that.data.info.id,
+            path: '/page/food/info?id=' + that.data.info.id,
             success: function (res) {
                 var that = this
                 wx.request({
@@ -41,10 +41,6 @@ Page({
                             app.alert({'content': resp.msg})
                             return
                         }
-                        that.setData({
-                            'info':resp.data.info,
-                            'buyNumMax':resp.data.info.stock,
-                        })
                     },
                 })
             

@@ -17,6 +17,9 @@ def before_request():
   pattern = re.compile('%s' % '|'.join(ignore_check_login_urls))
   if pattern.match(path):
     return
+  # 如果是API接口，不需要进行认证
+  if '/api' in path:
+    return
 
   # 检查用户是否已经登录，如果登录则返回对应的用户信息
   user_info = check_login()

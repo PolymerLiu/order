@@ -1,8 +1,9 @@
-from flask import Blueprint,request,jsonify
+from flask import Blueprint,request,jsonify,g
 from application import app,db
 import requests,json
 from web.controllers.api import route_api
 from common.models.member.Member import Member
+from common.models.food.WxShareHistory import WxShareHistory
 from common.models.member.OauthMemberBind import OauthMemberBind
 from common.libs.Helper import getCurrentDate
 from common.libs.member.MemberService import MemberService
@@ -94,4 +95,14 @@ def checkReg():
 def share():
   resp = {'code':200,'msg':'操作成功','data':{}}
   req = request.values
+  url = req['url'] if 'url' in req else ''
+  member_info = g.member_info
+  model_share = WxShareHistory()
+  if member_info:
+    model_share.member_id = member_info.id
+  model_share.share_url = url
+  model_share.created_time = getCurrentDate()
+  db.session.add(model_share)
+  db.session.commit()
+  
   return jsonify(resp)

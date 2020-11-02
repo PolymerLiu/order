@@ -72,8 +72,9 @@ App({
     getCache:function (key) {
         var value = undefined
         try {
-            value = wx.getStorageSync('key')
+            value = wx.getStorageSync(key)
           } catch (e) {}
+        return value
     },
     setCache:function (key,value) {
         wx.setStorage({

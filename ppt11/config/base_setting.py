@@ -9,7 +9,9 @@ AUTH_COOKIE_NAME = 'mooc_food'
 # 过滤URL
 IGNORE_URLS = [
   '^/user/login',
-  # 对所有API接口都不做登录校验
+]
+# 对所有API接口都不做登录校验
+API_IGNORE_URLS = [
   '^/api',
 ]
 
