@@ -2,6 +2,7 @@
 //获取应用实例
 var app = getApp();
 var WxParse = require('../../wxParse/wxParse.js');
+var utils = require('../../utils/util');
 
 Page({
     data: {
@@ -20,22 +21,48 @@ Page({
         shopCarNum: 4,
         commentCount:2
     },
-    onLoad: function () {
-        var that = this;
-
-        that.setData({
-            "info": {
-                "id": 1,
-                "name": "小鸡炖蘑菇",
-                "summary": '<p>多色可选的马甲</p><p><img src="http://www.timeface.cn/uploads/times/2015/07/071031_f5Viwp.jpg"/></p><p><br/>相当好吃了</p>',
-                "total_count": 2,
-                "comment_count": 2,
-                "stock": 2,
-                "price": "80.00",
-                "main_image": "/images/food.jpg",
-                "pics": [ '/images/food.jpg','/images/food.jpg' ]
+    onShareAppMessage: function () {
+        var that = this
+        return{
+            title: that.data.info.name,
+            path: '/page/info?id=' + that.data.info.id,
+            success: function (res) {
+                var that = this
+                wx.request({
+                    url:app.buildUrl('/member/share'),
+                    method:'POST',
+                    data:{
+                        url:utils.getCurrentPageUrlWithArgs(),
+                    },
+                    header: app.getRequestHeader(),
+                    success: function (res) {
+                        var resp = res.data
+                        if (resp.code != 200) {
+                            app.alert({'content': resp.msg})
+                            return
+                        }
+                        that.setData({
+                            'info':resp.data.info,
+                            'buyNumMax':resp.data.info.stock,
+                        })
+                    },
+                })
+            
             },
-            buyNumMax:2,
+            fail: function () {
+            
+            },
+        }
+    },
+    onShow: function () {
+        this.getInfo()
+    },
+    onLoad: function (e) {
+        var that = this;
+        that.setData({
+            id:e.id
+        })
+        that.setData({
             commentList: [
                 {
                     "score": "好评",
@@ -57,8 +84,6 @@ Page({
                 }
             ]
         });
-
-        WxParse.wxParse('article', 'html', that.data.info.summary, that, 5);
     },
     goShopCar: function () {
         wx.reLaunch({
@@ -126,5 +151,28 @@ Page({
         this.setData({
             swiperCurrent: e.detail.current
         })
+    },
+    getInfo: function () {
+        var that = this
+        wx.request({
+            url:app.buildUrl('/food/info'),
+            data:{
+                id:that.data.id
+            },
+            header: app.getRequestHeader(),
+            success: function (res) {
+                var resp = res.data
+                if (resp.code != 200) {
+                    app.alert({'content': resp.msg})
+                    return
+                }
+                that.setData({
+                    'info':resp.data.info,
+                    'buyNumMax':resp.data.info.stock,
+                })
+                WxParse.wxParse('article', 'html', that.data.info.summary, that, 5);
+            },
+        })
+    
     }
 });

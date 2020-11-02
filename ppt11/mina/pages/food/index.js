@@ -19,11 +19,11 @@ Page({
         processing:false
     },
     onLoad: function () {
-        var that = this;
-
         wx.setNavigationBarTitle({
             title: app.globalData.shopName
         });
+    },
+    onShow: function () {
         this.getBannerAndCat()
         this.getFoodList()
     },

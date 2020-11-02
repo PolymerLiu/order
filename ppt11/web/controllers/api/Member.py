@@ -89,3 +89,9 @@ def checkReg():
   resp['data'] = {'token':token}
 
   return jsonify(resp)
+
+@route_api.route('/member/share',methods=['POST'])
+def share():
+  resp = {'code':200,'msg':'操作成功','data':{}}
+  req = request.values
+  return jsonify(resp)
