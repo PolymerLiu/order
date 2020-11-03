@@ -1,9 +1,10 @@
-from flask import Blueprint,request,jsonify
+from flask import Blueprint,request,jsonify,g
 from application import app,db
 import requests,json
 from web.controllers.api import route_api
 from common.libs.Helper import getCurrentDate
 from common.models.food.FoodCat import FoodCat
+from common.models.member.MemberCart import MemberCart
 from common.models.food.Food import Food
 from common.libs.UrlManager import UrlManager
 from sqlalchemy import or_
@@ -100,6 +101,11 @@ def foodInfo():
     resp['msg'] = '美食已下架~~'
     return jsonify(resp)
 
+  member_info = g.current_user
+  cart_number = 0
+  if member_info:
+    cart_number = MemberCart.query.filter_by(member_id=member_info.id).count()
+
   resp['data']['info'] = {
     'id':food_info.id,
     'name':food_info.name,
@@ -111,5 +117,7 @@ def foodInfo():
     'main_image':UrlManager.buildImageUrl(food_info.main_image),
     'pics':[UrlManager.buildImageUrl(food_info.main_image)],
   }
+  resp['data']['cart_number'] = cart_number
+
 
   return jsonify(resp)

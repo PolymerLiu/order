@@ -13,7 +13,7 @@ def before_request():
   api_ignore_urls = app.config['API_IGNORE_URLS']
   path = request.path
   if '/api' not in path:
-    return False
+    return 
 
   # 检查用户是否已经登录，如果登录则返回对应的用户信息
   member_info = check_member_login()
